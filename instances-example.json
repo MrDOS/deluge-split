@@ -1,0 +1,14 @@
+[
+    {
+        "name": "music",
+        "trackers": ["tracker.a.example.com"]
+    },
+    {
+        "name": "video",
+        "trackers": ["tracker.b.example.com", "tracker.c.example.com"]
+    },
+    {
+        "name": "misc",
+        "trackers": [".*"]
+    }
+]
