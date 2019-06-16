@@ -4,6 +4,7 @@
 Split a large Deluge state file into multiple smaller ones based on trackers.
 """
 
+import bencode
 import collections
 import deluge.core.torrentmanager
 import json
@@ -28,7 +29,10 @@ def main(argv):
     with open(argv[1], 'rb') as state_file:
         input_manager = pickle.load(state_file)
 
-    with open(argv[2], 'rb') as instances_file:
+    with open(argv[2], 'rb') as fastresume_file:
+        input_fastresume = bencode.bread(fastresume_file)
+
+    with open(argv[3], 'rb') as instances_file:
         instances = json.load(instances_file)
 
     """
@@ -36,9 +40,11 @@ def main(argv):
     """
 
     # The top-level serialized value is a TorrentManagerState instance. We'll
-    # create new, empty ones for each of our output instances.
+    # create new, empty ones for each of our output instances. Seed activity
+    # will be populated progressively as torrents are added to the manager.
     for instance in instances:
         instance['manager'] = deluge.core.torrentmanager.TorrentManagerState()
+        instance['fastresume'] = {}
 
     # Then it's just a matter of iterating over all the input torrents and
     # binning them appropriately.
@@ -48,6 +54,11 @@ def main(argv):
         if matching_instance:
             print('Torrent "%s" belongs with instance "%s".' % (torrent.torrent_id, matching_instance['name']))
             matching_instance['manager'].torrents.append(torrent)
+
+            if torrent.torrent_id in input_fastresume:
+                matching_instance['fastresume'][torrent.torrent_id] = input_fastresume[torrent.torrent_id]
+            else:
+                print('Warning: no fastresume data for torrent "%s"!' % torrent.torrent_id)
         else:
             print('Warning: no match for torrent "%s"!' % torrent.torrent_id)
 
@@ -68,6 +79,9 @@ def main(argv):
             # which Deluge itself would create, it's probably best to run this
             # under Python 2.
             pickle.dump(instance['manager'], state_file, 0)
+
+        with open('%s.fastresume' % instance['name'], 'wb') as fastresume_file:
+            bencode.bwrite(instance['fastresume'], fastresume_file)
 
         with open('%s.ids' % instance['name'], 'wb') as ids_file:
             ids = [torrent.torrent_id for torrent in instance['manager'].torrents]

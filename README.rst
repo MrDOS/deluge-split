@@ -50,17 +50,23 @@ for Python 2.)
 .. code-block:: shell
 
     $ git clone https://github.com/MrDOS/deluge-split
+    $ pip install bencode.py
     $ cd deluge-split
     $ # Define what new instance states should be created.
     $ cp instances-example.json instances.json && $EDITOR instances.json
-    $ python split.py /path/to/input/deluge/state/torrents.state instances.json
+    $ python split.py \
+             /path/to/input/deluge/state/torrents.state \
+             /path/to/input/deluge/state/torrents.fastresume \
+             instances.json
 
 For each instance defined
 in ``instances.json``,
 an ``ids`` file will be created
 containing the IDs of the torrents in the instance,
-and a ``state`` file will be created
-reflecting the state of those torrents.
+a ``state`` file will be created
+reflecting the state of those torrents,
+and a ``fastresume`` file will be created
+reflecting historic seeding activity for those torrents.
 
 .. _pickle: https://docs.python.org/2/library/pickle.html
 
