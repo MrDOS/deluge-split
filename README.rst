@@ -89,6 +89,28 @@ so that nothing gets missed,
 and you wouldn't want to have your catch-all at the beginning
 lest all of your torrents be added to that instance.
 
+Now with merging!
+=================
+
+If you've sliced and diced to your heart's content
+and then gave your brain time to catch up
+and ask what the hell you were doing,
+you'll be elated to learn
+that this project now offers a solution
+for merging Deluge instances:
+
+.. code-block:: shell
+
+    $ python merge.py \
+             /path/to/output/torrents.state \
+             /path/to/output/torrents.fastresume \
+             /path/to/first/input/torrents.state \
+             /path/to/first/input/torrents.fastresume \
+             /path/to/second/input/torrents.state \
+             /path/to/second/input/torrents.fastresume \
+             /path/to/nth/input/torrents.state \
+             /path/to/nth/input/torrents.fastresume
+
 License
 =======
 
